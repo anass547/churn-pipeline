@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned staging model for Telco customer data"
+
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer"
+        data_tests:
+          - unique
+          - not_null
+
+      - name: tenure
+        data_tests:
+          - not_null
+
+      - name: churn
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['1', '0']

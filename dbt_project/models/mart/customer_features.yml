@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: customers_features
+    description: "Customer features for churn prediction"
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer"
+        data_tests:
+          - unique
+          - not_null
+  
+      
