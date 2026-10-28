@@ -1,0 +1,49 @@
+{
+    "logistic_regression": {
+        "cross_validation": {
+            "roc_auc_mean": 0.8502832959897578,
+            "roc_auc_std": 0.010929285040268395
+        },
+        "test_metrics": {
+            "roc_auc": 0.8477395437753494,
+            "pr_auc": 0.6764317835275714,
+            "precision": 0.5025210084033613,
+            "recall": 0.7994652406417112,
+            "f1": 0.6171310629514963
+        }
+    },
+    "xgboost_unweighted": {
+        "cross_validation": {
+            "roc_auc_mean": 0.8373924322060592,
+            "roc_auc_std": 0.010144554465811749
+        },
+        "test_metrics": {
+            "roc_auc": 0.834511353948694,
+            "pr_auc": 0.6461168417402036,
+            "precision": 0.6363636363636364,
+            "recall": 0.5240641711229946,
+            "f1": 0.5747800586510264
+        }
+    },
+    "xgboost_tuned_weighted": {
+        "cross_validation": {
+            "roc_auc_best": 0.8502163351460925
+        },
+        "best_params": {
+            "classifier__colsample_bytree": 0.7,
+            "classifier__gamma": 0.0,
+            "classifier__learning_rate": 0.012469634313376046,
+            "classifier__max_depth": 4,
+            "classifier__min_child_weight": 7,
+            "classifier__n_estimators": 400,
+            "classifier__subsample": 0.7
+        },
+        "test_metrics": {
+            "roc_auc": 0.8468766953421684,
+            "pr_auc": 0.6724994724839991,
+            "precision": 0.52,
+            "recall": 0.7994652406417112,
+            "f1": 0.6301369863013698
+        }
+    }
+}

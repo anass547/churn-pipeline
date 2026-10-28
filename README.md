@@ -41,9 +41,9 @@ churn-pipeline/
 ├── data/raw/          # CSV (not committed)
 ├── dbt_project/       # dbt models and tests
 ├── ml/                # loading and training scripts
+│   └── reports/       # SHAP plots and ML reports
 ├── dags/              # Airflow DAGs (planned)
 ├── app/               # Streamlit dashboard (planned)
 ├── tests/
-├── reports/
 ├── LEARNINGS.md       # what I did, what broke, how I fixed it
 └── README.md

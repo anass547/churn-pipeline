@@ -2,3 +2,12 @@ pandas
 sqlalchemy
 psycopg2-binary
 dbt-postgres
+scikit-learn
+numpy
+xgboost
+shap
+mlflow
+optuna
+matplotlib
+joblib
+scipy

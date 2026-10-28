@@ -1,0 +1,54 @@
+,feature,mean_abs_shap
+0,numerical__senior_citizen,0.056181237
+1,numerical__monthly_charges,0.056181237
+2,numerical__total_charges,0.056181237
+3,numerical__tenure,0.056181237
+4,numerical__monthly_to_total_ratio,0.056181237
+5,numerical__n_services,0.056181237
+6,numerical__is_month_to_month,0.056181237
+7,categorical__gender_Female,0.056181237
+8,categorical__gender_Male,0.056181237
+9,categorical__partner_No,0.056181237
+10,categorical__partner_Yes,0.056181237
+11,categorical__dependents_No,0.056181237
+12,categorical__dependents_Yes,0.056181237
+13,categorical__phone_service_No,0.056181237
+14,categorical__phone_service_Yes,0.056181237
+15,categorical__multiple_lines_No,0.056181237
+16,categorical__multiple_lines_No phone service,0.056181237
+17,categorical__multiple_lines_Yes,0.056181237
+18,categorical__internet_service_DSL,0.056181237
+19,categorical__internet_service_Fiber optic,0.056181237
+20,categorical__internet_service_No,0.056181237
+21,categorical__online_security_No,0.056181237
+22,categorical__online_security_No internet service,0.056181237
+23,categorical__online_security_Yes,0.056181237
+24,categorical__online_backup_No,0.056181237
+25,categorical__online_backup_No internet service,0.056181237
+26,categorical__online_backup_Yes,0.056181237
+27,categorical__device_protection_No,0.056181237
+28,categorical__device_protection_No internet service,0.056181237
+29,categorical__device_protection_Yes,0.056181237
+30,categorical__tech_support_No,0.056181237
+31,categorical__tech_support_No internet service,0.056181237
+32,categorical__tech_support_Yes,0.056181237
+33,categorical__streaming_tv_No,0.056181237
+34,categorical__streaming_tv_No internet service,0.056181237
+35,categorical__streaming_tv_Yes,0.056181237
+36,categorical__streaming_movies_No,0.056181237
+37,categorical__streaming_movies_No internet service,0.056181237
+38,categorical__streaming_movies_Yes,0.056181237
+39,categorical__contract_Month-to-month,0.056181237
+40,categorical__contract_One year,0.056181237
+41,categorical__contract_Two year,0.056181237
+42,categorical__paperless_billing_No,0.056181237
+43,categorical__paperless_billing_Yes,0.056181237
+44,categorical__payment_method_Bank transfer (automatic),0.056181237
+45,categorical__payment_method_Credit card (automatic),0.056181237
+46,categorical__payment_method_Electronic check,0.056181237
+47,categorical__payment_method_Mailed check,0.056181237
+48,categorical__tenure_bucket_0-12,0.056181237
+49,categorical__tenure_bucket_13-24,0.056181237
+50,categorical__tenure_bucket_25-48,0.056181237
+51,categorical__tenure_bucket_49-60,0.056181237
+52,categorical__tenure_bucket_61+,0.056181237

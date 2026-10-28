@@ -10,6 +10,27 @@ select
     customer_id,
     churn,
 
+    gender,
+    senior_citizen,
+    partner,
+    dependents,
+    phone_service,
+    multiple_lines,
+    internet_service,
+    online_security,
+    online_backup,
+    device_protection,
+    tech_support,
+    streaming_tv,
+    streaming_movies,
+    contract,
+    paperless_billing,
+    payment_method,
+    monthly_charges,
+    total_charges,
+    tenure,
+
+
     case
     when tenure between 0 and 12 then '0-12'
     when tenure between 13 and 24 then '13-24'
