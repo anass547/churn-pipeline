@@ -1,6 +1,18 @@
+# Data
 data/raw/*.csv
-.venv
-__pycache__
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Secrets
 .env
+
+# dbt
 dbt_project/target/
 dbt_project/logs/
+
+# Logs
+*.log
+logs/
