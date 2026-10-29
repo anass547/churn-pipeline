@@ -3,7 +3,7 @@
 **Date:** October 25, 2026  
 **Status:** Completed
 
-## 1. What I Did
+## 0.1. What I Did
 
 - Set up the project repository structure, Python virtual environment, and dependencies.
 - Configured and launched PostgreSQL 16 using Docker Compose, with a named volume for persistent data storage and port `5432` exposed.
@@ -13,14 +13,14 @@
 
 - Stored the raw dataset in the `raw_customers` table.
 
-## 2. What I Learned
+## 0.2. What I Learned
 
 - **SQLAlchemy Engine:** Manages database connections using a connection URL and allows pandas to interact with PostgreSQL.
 - **pandas `to_sql()`:** Creates a database table and inserts DataFrame records using a SQLAlchemy engine.
 - **Docker Named Volumes:** Persist database data even when the container is stopped or recreated, provided the volume is retained.
 - **Raw Data Ingestion:** Loading source data into a raw table preserves the original structure for downstream transformation and cleaning.
 
-## 3. Results
+## 0.3. Results
 
 - **Database:** PostgreSQL 16
 - **Source:** Telco Customer Churn CSV
@@ -33,7 +33,7 @@
 **Date:** October 26, 2026  
 **Status:** Completed
 
-## 1. What I Did
+## 1.1. What I Did
 1. initializing the dbt project and setting the source db identifications 
 2. set up two layer the first one is staging where i processed some columns renaming them to be in snake_case format , and changing the data type of churn from yes/no to 1/0 and type of totalcharges from string to numerical .
 then the mart layer adding four features :
@@ -45,12 +45,12 @@ is_month_to_month: 1 if the contract is month-to-month, otherwise 0.
 4. -adding tests : customerid should be unique and not_null  ,churn accepted_values (0 and 1) , tenure should be not_null in staging .
   -customeridshould be unique and not_null the mart.
 
-### What I learned
+### 1.2. What I learned
 - `source()` points to raw tables, `ref()` points to other dbt models, and dbt builds the dependency graph from them.
 - Staging models are views ; marts are tables .
 - dbt tests are SQL queries that return failing rows; a test passes when it returns none.
 - Print and check the DataFrame's column names before writing to the database.
-### Results
+### 1.3. Results
 - `customer_features` has 7,043 rows.
 - `total_charges` is now numeric.
 - `customer_id` is unique and not null.
@@ -61,7 +61,7 @@ is_month_to_month: 1 if the contract is month-to-month, otherwise 0.
 
 **Date:** October 29, 2026  
 **Status:** Completed
-## 1. What I Did
+## 2.1. What I Did
 # preprocessing data: 
   1. Read the whole customer_features table into a DataFrame
   2. Separated the target variable (churn) from the input features.
@@ -97,14 +97,14 @@ Used the optimized thresholds for test predictions.
 # Prediction storage
 - Prepared the prediction results for storage in PostgreSQL.
 
-### What I learned
+### 2.2. What I learned
 - Scikit-learn pipelines: Combining preprocessing and model training in a pipeline helps prevent data leakage during cross-validation because transformations are fitted within each training fold.
 - Stratified splitting: Stratification preserves the approximate churn proportion in both training and test sets.
 - Model comparison: A more complex model does not necessarily outperform a simpler baseline. Logistic Regression achieved a competitive ROC-AUC and the highest PR-AUC among the evaluated models.
 SHAP: Global explanations show which features contribute most to predictions across a dataset, while local explanations help explain an individual prediction. 
 
 
-### Results
+### 2.3. Results
 
 Three classification models were evaluated: Logistic Regression, unweighted XGBoost, and hyperparameter-tuned weighted XGBoost.
 
