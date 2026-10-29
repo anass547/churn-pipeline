@@ -5,14 +5,28 @@ data/raw/*.csv
 .venv/
 __pycache__/
 *.py[cod]
-
+.venv-*/
 # Secrets
 .env
-
+.venv-*/
 # dbt
 dbt_project/target/
 dbt_project/logs/
-
+dbt_project/dbt_packages/
 # Logs
 *.log
 logs/
+
+# ml
+ml/joblib/
+
+# mlflow
+mlruns/
+mlflow.db
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

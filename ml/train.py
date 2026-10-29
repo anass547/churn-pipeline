@@ -1,6 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
-from sklearn.model_selection import train_test_split, cross_val_score , StratifiedKFold,RandomizedSearchCV
+from sklearn.model_selection import train_test_split, cross_val_score , StratifiedKFold,RandomizedSearchCV, cross_val_predict
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder,StandardScaler
 from sklearn.pipeline import Pipeline
@@ -19,6 +19,8 @@ import numpy as np
 from sklearn.base import clone
 from scipy.stats import loguniform
 import joblib
+from tracking import track_experiment
+import matplotlib.pyplot as plt
 
 
 
@@ -82,8 +84,13 @@ joblib.dump(
     "ml/joblib/test_data.joblib"
 )
 
+cv = StratifiedKFold(
+    n_splits=5,
+    shuffle=True,
+    random_state=42
+)
 
-cross_val_scores = cross_val_score(model_pipeline , X_train,y_train, cv=5, scoring="roc_auc")
+cross_val_scores = cross_val_score(model_pipeline , X_train,y_train, cv=cv, scoring="roc_auc")
 
 model_pipeline.fit(X_train, y_train)
 y_pred = model_pipeline.predict(X_test)
@@ -102,7 +109,7 @@ metrics_LR = {
 
 
 xgb_pipeline_unweighted=Pipeline([
-    ("prepocessor",clone(processor)),
+    ("preprocessor",clone(processor)),
     ("classifier",XGBClassifier(objective="binary:logistic",
         eval_metric="auc",
         tree_method="hist",
@@ -113,7 +120,7 @@ xgb_pipeline_unweighted=Pipeline([
 
 ])
 
-cv_scores_unweighted=cross_val_score(xgb_pipeline_unweighted,X_train,y_train, cv=5, scoring="roc_auc")
+cv_scores_unweighted=cross_val_score(xgb_pipeline_unweighted,X_train,y_train, cv=cv, scoring="roc_auc")
 xgb_pipeline_unweighted.fit(X_train,y_train)
 y_xgb_pred_unweighted = xgb_pipeline_unweighted.predict(X_test)
 y_xgb_proba_unweighted = xgb_pipeline_unweighted.predict_proba(X_test)[:, 1]
@@ -156,9 +163,7 @@ params = {
     "classifier__subsample": [0.6, 0.7, 0.8, 0.9, 1.0],
     "classifier__n_estimators": [100, 200, 300, 400, 500]
 }
-cv=StratifiedKFold(n_splits=5,
-    shuffle=True,
-    random_state=42)
+
 rs_model=RandomizedSearchCV(estimator=xgb_pipeline_weighted,param_distributions=params,n_iter=30,scoring='roc_auc',n_jobs=-1,cv=cv,verbose=3,random_state=42,refit=True)
 
 rs_model.fit(X_train,y_train)
@@ -168,6 +173,13 @@ print(rs_model.best_params_)
 # Evaluate the best model on the test set
 best_model = rs_model.best_estimator_
 
+cv_scores_weighted = cross_val_score(
+    clone(best_model),
+    X_train,
+    y_train,
+    cv=cv,
+    scoring="roc_auc"
+)
 y_xgb_pred_weighted = best_model.predict(X_test)
 y_xgb_proba_weighted = best_model.predict_proba(X_test)[:, 1]
 
@@ -210,7 +222,10 @@ report = {
 
     "xgboost_tuned_weighted": {
         "cross_validation": {
+            "roc_auc_mean": float(cv_scores_weighted.mean()),
+            "roc_auc_std": float(cv_scores_weighted.std()),
             "roc_auc_best": float(rs_model.best_score_),
+            
         },
         "best_params": rs_model.best_params_,
         "test_metrics": metrics_XGB_weighted,
@@ -220,5 +235,95 @@ report = {
 with open("ml/reports/training_report.json", "w", encoding="utf-8") as f:
     json.dump(report, f, indent=4, ensure_ascii=False)
 
-print("\nTraining report saved to ml/training_report.json")
+print("\nTraining report saved to ml/reports/training_report.json")
+
+
 engine.dispose()
+
+
+
+# 1. Logistic Regression baseline — after fitting lr_model
+track_experiment(
+    model_name="logistic_regression_baseline",
+    model=model_pipeline,
+    X_test=X_test,
+    y_test=y_test,
+    params=model_pipeline.named_steps["classifier"].get_params(),
+)
+
+# 2. Untuned XGBoost — after fitting xgb_model
+track_experiment(
+    model_name="xgboost_baseline",
+    model=xgb_pipeline_unweighted,
+    X_test=X_test,
+    y_test=y_test,
+    params=xgb_pipeline_unweighted.named_steps["classifier"].get_params(),
+)
+
+# 3. Tuned XGBoost — after RandomizedSearchCV
+track_experiment(
+    model_name="xgboost_tuned",
+    model=best_model,
+    X_test=X_test,
+    y_test=y_test,
+    params=best_model.named_steps["classifier"].get_params(),
+    extra_artifacts=[
+        "reports/shap_summary.png",
+        "reports/shap_importance.png",
+        "reports/shap_waterfall_high_risk.png",
+    ],
+)
+
+
+# Business cost assumptions
+fn_cost = 5
+fp_cost = 1
+thresholds = np.arange(0.10, 0.91, 0.01)
+
+models = {
+    "logistic_regression": model_pipeline,
+    "xgboost_unweighted": xgb_pipeline_unweighted,
+    "xgboost_tuned_weighted": best_model
+}
+
+threshold_results = {}
+
+for model_name, model in models.items():
+
+    oof_proba = cross_val_predict(
+        clone(model),
+        X_train,
+        y_train,
+        cv=cv,
+        method="predict_proba",
+        n_jobs=-1
+    )[:, 1]
+
+    costs = []
+
+    for threshold in thresholds:
+        predictions = (oof_proba >= threshold).astype(int)
+
+        fn = ((y_train == 1) & (predictions == 0)).sum()
+        fp = ((y_train == 0) & (predictions == 1)).sum()
+
+        total_cost = fn_cost * fn + fp_cost * fp
+        costs.append(total_cost)
+
+    best_index = np.argmin(costs)
+    best_threshold = float(thresholds[best_index])
+
+    threshold_results[model_name] = {
+        "threshold": best_threshold,
+        "estimated_cost": float(costs[best_index])
+    }
+
+    
+
+# Save threshold results
+with open(
+    "ml/reports/threshold_results.json",
+    "w",
+    encoding="utf-8"
+) as f:
+    json.dump(threshold_results, f, indent=4)

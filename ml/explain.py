@@ -4,8 +4,8 @@ import shap
 import numpy as np
 import matplotlib.pyplot as plt
 # 1. LOAD MODEL AND TEST DATA
-model=joblib.load("ml/best_xgboost_weighted.joblib")
-test_data=joblib.load("ml/test_data.joblib")
+model=joblib.load("ml/joblib/best_xgboost_weighted.joblib")
+test_data=joblib.load("ml/joblib/test_data.joblib")
 X_test=test_data["X_test"]
 y_test=test_data["y_test"]
 
@@ -42,7 +42,8 @@ shap_df.to_csv("ml/reports/shap_values_test.csv")
 features_importance=pd.DataFrame(
     {
         "feature":features_names,
-        "mean_abs_shap":np.abs(shap_values).mean()
+        "mean_abs_shap":np.abs(shap_values).mean(axis=0),
+        
     }
 ).sort_values(
     "mean_abs_shap",

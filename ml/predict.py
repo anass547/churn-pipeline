@@ -1,6 +1,12 @@
 import joblib
 import pandas as pd
 from sqlalchemy import create_engine
+import json
+
+with open("ml/reports/threshold_results.json", "r") as f:
+    threshold_results = json.load(f)
+
+threshold = threshold_results["xgboost_tuned_weighted"]["threshold"]
 
 engine=create_engine('postgresql+psycopg2://churn:churn@localhost:5432/churn')
 
@@ -13,8 +19,11 @@ customer_ids=df["customer_id"]
 X=df.drop(columns=["customer_id","churn"])
 
 churn_probabilities=model.predict_proba(X)[:,1]
+
+
+
 predicted_churn = (
-    churn_probabilities >= 0.5
+    churn_probabilities >= threshold
 ).astype(int)
 
 #  BUILD PREDICTIONS TABLE
@@ -22,10 +31,10 @@ predicted_churn = (
 predictions=pd.DataFrame(
     {
         "customer_id":customer_ids,
-        'churn_probabilitiy':churn_probabilities,
+        'churn_probability':churn_probabilities,
         "predicted_churn":predicted_churn,
          "model_version":"xgboost_weighted_v1",
-         "timestamp":pd.Timestamp.now(tz="UTC")
+         "scored_at":pd.Timestamp.now(tz="UTC")
 
 
     }

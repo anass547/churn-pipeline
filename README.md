@@ -5,6 +5,7 @@ End-to-end customer churn prediction pipeline: raw data is loaded into PostgreSQ
 **Status:** 
 (Phase 0 done: database + raw data load)
 (Phase 1 done: dbt staging and features)
+(Phase 2 done: ML + explainability)
 
 
 ## The planned stack:
@@ -34,6 +35,10 @@ Prerequisites: Docker, Python 3.10+.
    - `dbt run` (builds `stg_customers` and `customer_features`)
    - `dbt test` (all tests should pass)
 
+6. - data preprocessing and training the tree models LogisticRegression , XGboost , XGboost wieghted and tuned , and tracking results using mlflow: `python ml/train.py`
+   - explainability of the models using shap , and saving reports into ml/reports : `python ml/explain.py`
+   - storing the results of prediction in a table in the postgres db : `python ml/predict.py`
+
 
 ## Project structure
 ```
@@ -41,7 +46,9 @@ churn-pipeline/
 ├── data/raw/          # CSV (not committed)
 ├── dbt_project/       # dbt models and tests
 ├── ml/                # loading and training scripts
+│   ├──joblib/         # save the model and the test data as joblin files 
 │   └── reports/       # SHAP plots and ML reports
+│
 ├── dags/              # Airflow DAGs (planned)
 ├── app/               # Streamlit dashboard (planned)
 ├── tests/

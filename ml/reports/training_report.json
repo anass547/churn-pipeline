@@ -1,8 +1,8 @@
 {
     "logistic_regression": {
         "cross_validation": {
-            "roc_auc_mean": 0.8502832959897578,
-            "roc_auc_std": 0.010929285040268395
+            "roc_auc_mean": 0.8502720984850576,
+            "roc_auc_std": 0.011965043210865441
         },
         "test_metrics": {
             "roc_auc": 0.8477395437753494,
@@ -14,8 +14,8 @@
     },
     "xgboost_unweighted": {
         "cross_validation": {
-            "roc_auc_mean": 0.8373924322060592,
-            "roc_auc_std": 0.010144554465811749
+            "roc_auc_mean": 0.8421616011609224,
+            "roc_auc_std": 0.010047143187325766
         },
         "test_metrics": {
             "roc_auc": 0.834511353948694,
@@ -27,6 +27,8 @@
     },
     "xgboost_tuned_weighted": {
         "cross_validation": {
+            "roc_auc_mean": 0.8502163351460925,
+            "roc_auc_std": 0.011459577495675458,
             "roc_auc_best": 0.8502163351460925
         },
         "best_params": {

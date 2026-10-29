@@ -1,0 +1,14 @@
+{
+    "logistic_regression": {
+        "threshold": 0.3599999999999999,
+        "estimated_cost": 2335.0
+    },
+    "xgboost_unweighted": {
+        "threshold": 0.15999999999999998,
+        "estimated_cost": 2488.0
+    },
+    "xgboost_tuned_weighted": {
+        "threshold": 0.3699999999999999,
+        "estimated_cost": 2348.0
+    }
+}
