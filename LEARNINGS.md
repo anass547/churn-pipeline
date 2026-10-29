@@ -62,13 +62,13 @@ is_month_to_month: 1 if the contract is month-to-month, otherwise 0.
 **Date:** October 29, 2026  
 **Status:** Completed
 ## 2.1. What I Did
-# preprocessing data: 
+### preprocessing data: 
   1. Read the whole customer_features table into a DataFrame
   2. Separated the target variable (churn) from the input features.
   3. Removed customer_id from the model features while preserving it for customer-level predictions.
   4. train/test split (80/20)
   5. Imputed missing numerical values and encoded categorical variables using one-hot encoding.
-# Model training and comparison:
+### Model training and comparison:
   I trained and evaluated the following models:
   1. LogisticRegresson as the baseline modelas the baseline model 
   2. xgboost with unweighted churn class learning
@@ -80,31 +80,31 @@ is_month_to_month: 1 if the contract is month-to-month, otherwise 0.
     * precision,
     * recall,
     * f1 score
-# Threshold optimization
+### Threshold optimization
 
 - Generated OOF predictions for each model using cross-validation.
 - Optimized an individual classification threshold for each model by minimizing estimated business cost (FN = 5, FP = 1).
 - Saved optimal thresholds in ml/reports/threshold_results.json.
 
 Used the optimized thresholds for test predictions.
-# Model explainability
+### Model explainability
 - explain each model's predictions using shap .
 - Generated global feature importance reports and summary visualizations.
 - Saved the explainability reports in ml/reports/.
-# Experiment tracking
+### Experiment tracking
 - Created ml/tracking.py module for MLflow experiment tracking.
 - logged model parameters and metrics .
-# Prediction storage
+### Prediction storage
 - Prepared the prediction results for storage in PostgreSQL.
 
-### 2.2. What I learned
+## 2.2. What I learned
 - Scikit-learn pipelines: Combining preprocessing and model training in a pipeline helps prevent data leakage during cross-validation because transformations are fitted within each training fold.
 - Stratified splitting: Stratification preserves the approximate churn proportion in both training and test sets.
 - Model comparison: A more complex model does not necessarily outperform a simpler baseline. Logistic Regression achieved a competitive ROC-AUC and the highest PR-AUC among the evaluated models.
 SHAP: Global explanations show which features contribute most to predictions across a dataset, while local explanations help explain an individual prediction. 
 
 
-### 2.3. Results
+## 2.3. Results
 
 Three classification models were evaluated: Logistic Regression, unweighted XGBoost, and hyperparameter-tuned weighted XGBoost.
 
