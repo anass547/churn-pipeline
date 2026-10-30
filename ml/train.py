@@ -23,11 +23,10 @@ from tracking import track_experiment
 import matplotlib.pyplot as plt
 
 
+from db import get_engine
 
+engine = get_engine()
 
-engine = create_engine(
-"postgresql+psycopg2://churn:churn@localhost:5432/churn"
-)
 df = pd.read_sql("SELECT * FROM analytics.customer_features", engine)
 
 

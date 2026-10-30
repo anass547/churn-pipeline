@@ -2,13 +2,16 @@ import joblib
 import pandas as pd
 from sqlalchemy import create_engine
 import json
+from db import get_engine
+
+
 
 with open("ml/reports/threshold_results.json", "r") as f:
     threshold_results = json.load(f)
 
 threshold = threshold_results["xgboost_tuned_weighted"]["threshold"]
 
-engine=create_engine('postgresql+psycopg2://churn:churn@localhost:5432/churn')
+engine = get_engine()
 
 model=joblib.load("ml/joblib/best_xgboost_weighted.joblib")
 
