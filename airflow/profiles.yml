@@ -1,0 +1,12 @@
+dbt_project:
+  outputs:
+    dev:
+      dbname: churn
+      host: db
+      pass: churn
+      port: 5432
+      schema: analytics
+      threads: 1
+      type: postgres
+      user: churn
+  target: dev

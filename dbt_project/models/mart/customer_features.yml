@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: customers_features
+  - name: customer_features
     description: "Customer features for churn prediction"
     columns:
       - name: customer_id

@@ -54,3 +54,91 @@ churn-pipeline/
 ├── tests/
 ├── LEARNINGS.md       # what I did, what broke, how I fixed it
 └── README.md
+
+
+## Automated Pipeline Orchestration
+
+The project uses Apache Airflow to orchestrate an end-to-end customer churn pipeline. The workflow integrates Python, PostgreSQL, dbt, and a trained XGBoost model.
+
+### Architecture
+
+```text
+Telco Customer Churn CSV
+          |
+          v
+Python Data Ingestion
+          |
+          v
+PostgreSQL: raw_customers
+          |
+          v
+dbt Transformations
+          |
+          v
+analytics.customer_features
+          |
+          v
+dbt Data Quality Tests
+          |
+          v
+Saved XGBoost Model
+          |
+          v
+Churn Predictions
+          |
+          v
+PostgreSQL: analytics.predictions
+```
+
+### Airflow DAG
+
+**DAG ID:** `churn_daily_pipeline`
+
+The DAG executes four tasks in sequence:
+
+1. `load_raw_data`
+2. `dbt_run`
+3. `dbt_test`
+4. `predict_churn`
+
+The pipeline is scheduled daily, with catchup disabled and retries configured for failed tasks. Prediction generation depends on the successful completion of the data-quality tests.
+
+### Technology Stack
+
+- **Python & pandas:** Data ingestion and preprocessing.
+- **PostgreSQL:** Raw data storage and prediction persistence.
+- **SQLAlchemy:** Database connectivity.
+- **dbt:** SQL transformations and data-quality tests.
+- **Apache Airflow:** Workflow scheduling, dependencies, retries, and monitoring.
+- **Docker Compose:** Containerized services and networking.
+- **XGBoost & scikit-learn:** Churn classification and probability estimation.
+
+### Running the Pipeline
+
+Start the PostgreSQL service from the project root:
+
+```bash
+docker compose up -d
+```
+
+Start Airflow:
+
+```bash
+docker compose --env-file airflow/.env -f airflow/docker-compose.yaml up -d
+```
+
+Open the Airflow UI at `http://localhost:8080`, enable `churn_daily_pipeline` if it is paused, and trigger a DAG run.
+
+Monitor the task statuses and logs in the Airflow UI.
+
+### Prediction Output
+
+The `analytics.predictions` table stores:
+
+- `customer_id`: Customer identifier.
+- `churn_probability`: Model-estimated probability of churn.
+- `predicted_churn`: Binary churn prediction based on the configured threshold.
+- `model_version`: Identifier for the model used.
+- `scored_at`: UTC timestamp of prediction generation.
+
+The pipeline loads an existing model for inference; model training is handled separately.

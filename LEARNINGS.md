@@ -113,3 +113,22 @@ Cross-validation results showed that Logistic Regression and tuned weighted XGBo
 On the test set, Logistic Regression achieved the highest PR-AUC (0.6764), whereas tuned weighted XGBoost achieved the highest F1-score (0.6301) at the default classification threshold of 0.5.
 
 These results show that model selection should not rely on a single metric. The final choice should also consider the business cost of false negatives and false positives, using thresholds selected from training data rather than the test set.
+
+## Phase 3: Airflow Orchestration
+
+### What I Learned
+
+- **Workflow orchestration with Apache Airflow:** Created a DAG to automate the customer churn pipeline, define task dependencies, configure retries, and monitor execution through the Airflow UI.
+- **Docker networking:** Connected separate Docker Compose projects so Airflow could communicate with the PostgreSQL database using Docker service names.
+- **Database ingestion:** Learned the difference between `if_exists="replace"` and `if_exists="append"` in pandas. Replacing a table can break dependent database views, while appending without clearing existing data creates duplicates. Using a transactional `DELETE` followed by an insert preserves the table and its dependencies.
+- **Data transformation with dbt:** Integrated dbt models and data-quality tests into the Airflow workflow.
+- **Failure handling:** Configured task dependencies so prediction generation only starts after ingestion, transformations, and data-quality tests succeed.
+- **ML inference:** Integrated a saved XGBoost model into the pipeline to generate churn probabilities and classifications without retraining the model on every run.
+
+### Pipeline Execution Order
+
+1. `load_raw_data`: Loads customer data from CSV into PostgreSQL.
+2. `dbt_run`: Builds the staging and customer feature models.
+3. `dbt_test`: Executes data-quality tests.
+4. `predict_churn`: Loads the trained model and writes predictions to PostgreSQL.
+
