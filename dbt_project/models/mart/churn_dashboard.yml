@@ -1,0 +1,19 @@
+
+version: 2
+
+models:
+  - name: churn_dashboard
+    description: Customer features joined with the latest churn predictions.
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: churn_probability
+        data_tests:
+          - not_null
+
+      - name: predicted_churn
+        data_tests:
+          - not_null

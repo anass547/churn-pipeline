@@ -115,6 +115,8 @@ On the test set, Logistic Regression achieved the highest PR-AUC (0.6764), where
 These results show that model selection should not rely on a single metric. The final choice should also consider the business cost of false negatives and false positives, using thresholds selected from training data rather than the test set.
 
 ## Phase 3: Airflow Orchestration
+**Date:** October 31, 2026  
+**Status:** Completed
 
 ### What I Learned
 
@@ -132,3 +134,15 @@ These results show that model selection should not rely on a single metric. The 
 3. `dbt_test`: Executes data-quality tests.
 4. `predict_churn`: Loads the trained model and writes predictions to PostgreSQL.
 
+## Phase 4: Streamlit Dashboard
+
+**Date:** November 1, 2026  
+**Status:** Completed
+
+### What I Learned
+
+- **Streamlit:** Built an interactive dashboard to display churn predictions and key performance indicators.
+- **PostgreSQL integration:** Connected the dashboard to the `analytics.churn_dashboard` table.
+- **Data visualization:** Used Plotly to visualize churn across customer segments.
+- **Interactive filtering:** Added filters to explore customers by contract, internet service, and churn probability.
+- **Dashboard integration:** Displayed SHAP reports and model comparison results.

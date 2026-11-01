@@ -6,7 +6,8 @@ End-to-end customer churn prediction pipeline: raw data is loaded into PostgreSQ
 (Phase 0 done: database + raw data load)
 (Phase 1 done: dbt staging and features)
 (Phase 2 done: ML + explainability)
-
+(Phase 3 done: orchestrate churn pipeline with Airflow)
+(Phase 4 done: Streamlit dashboard)
 
 ## The planned stack:
 - PostgreSQL (storage)
@@ -19,42 +20,111 @@ End-to-end customer churn prediction pipeline: raw data is loaded into PostgreSQ
 Telco Customer Churn dataset (IBM sample data) from
 [Kaggle](https://www.kaggle.com/datasets/blastchar/telco-customer-churn).
 ## How to run (current state)
-Prerequisites: Docker, Python 3.10+.
-1. Create and activate a virtual environment, then install dependencies:
-   `pip install -r requirements.txt`
-2. Start the database: `docker compose up -d`
-3. Load the data: `python ml/load.py`
 
-4. Configure dbt (one time). Create `~/.dbt/profiles.yml` (outside the repo) with a profile matching the one in `dbt_project/dbt_project.yml`:
+**Prerequisites:** Docker, Python 3.10+, and the required environment variables configured.
+
+1. **Create and activate a virtual environment**, then install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Start PostgreSQL:**
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. **Load the raw data:**
+
+   ```bash
+   python ml/load.py
+   ```
+
+4. **Configure dbt (one time).** Create `~/.dbt/profiles.yml` outside the repository, with a profile matching `dbt_project/dbt_project.yml`:
+
    - type: `postgres`
    - host: `localhost`, port: `5432`
    - user / password / dbname: `churn`
    - schema: `analytics`
-5. From inside `dbt_project/`:
-   - `dbt debug` (all checks should pass)
-   - `dbt run` (builds `stg_customers` and `customer_features`)
-   - `dbt test` (all tests should pass)
 
-6. - data preprocessing and training the tree models LogisticRegression , XGboost , XGboost wieghted and tuned , and tracking results using mlflow: `python ml/train.py`
-   - explainability of the models using shap , and saving reports into ml/reports : `python ml/explain.py`
-   - storing the results of prediction in a table in the postgres db : `python ml/predict.py`
+5. **Build and test the dbt models.** From inside `dbt_project/`:
 
+   ```bash
+   dbt debug
+   dbt run
+   dbt test
+   ```
+
+   This builds the staging and analytical models, including `stg_customers`, `customer_features`, and `churn_dashboard`.
+
+6. **Train and evaluate the models:**
+
+   ```bash
+   python ml/train.py
+   ```
+
+   This handles preprocessing, trains and evaluates Logistic Regression and the baseline, weighted, and tuned XGBoost models, and tracks experiments with MLflow.
+
+7. **Generate SHAP explainability reports:**
+
+   ```bash
+   python ml/explain.py
+   ```
+
+   Reports and visualizations are saved in `ml/reports/`.
+
+8. **Generate customer churn predictions:**
+
+   ```bash
+   python ml/predict.py
+   ```
+
+   This loads the trained model, scores customers, and stores the results in the PostgreSQL `analytics.predictions` table.
+
+9. **Run the Streamlit dashboard locally:**
+
+   ```bash
+   streamlit run app/dashboard.py
+   ```
+
+   Open `http://localhost:8501` to explore churn KPIs, high-risk customers, customer segments, and model explainability.
+
+10. **Run the automated pipeline with Airflow:**
+
+    Start Airflow using the configuration in `airflow/`:
+
+    ```bash
+    docker compose --env-file airflow/.env -f airflow/docker-compose.yaml up -d
+    ```
+
+    Open `http://localhost:8080` and trigger the `churn_daily_pipeline` DAG. It orchestrates data loading, dbt transformations and tests, and prediction generation.
+
+---
 
 ## Project structure
-```
-churn-pipeline/
-├── data/raw/          # CSV (not committed)
-├── dbt_project/       # dbt models and tests
-├── ml/                # loading and training scripts
-│   ├──joblib/         # save the model and the test data as joblin files 
-│   └── reports/       # SHAP plots and ML reports
-│
-├── dags/              # Airflow DAGs (planned)
-├── app/               # Streamlit dashboard (planned)
-├── tests/
-├── LEARNINGS.md       # what I did, what broke, how I fixed it
-└── README.md
 
+```text
+churn-pipeline/
+├── data/
+│   └── raw/                  # Source CSV (not committed)
+├── dbt_project/              # dbt models, sources, and tests
+├── ml/
+│   ├── joblib/               # Saved models and test datasets
+│   ├── reports/              # SHAP plots and ML reports
+│   ├── load.py               # Raw data ingestion
+│   ├── train.py              # Model training and evaluation
+│   ├── explain.py            # SHAP explainability
+│   ├── predict.py            # Customer churn predictions
+│   └── db.py                 # Database connection
+├── dags/                     # Airflow DAGs
+├── airflow/                  # Airflow Docker Compose and configuration
+├── app/                      # Streamlit dashboard
+├── tests/
+├── LEARNINGS.md              # What I did, what broke, and how I fixed it
+├── requirements.txt
+└── README.md
+```
 
 ## Automated Pipeline Orchestration
 
@@ -62,7 +132,7 @@ The project uses Apache Airflow to orchestrate an end-to-end customer churn pipe
 
 ### Architecture
 
-```text
+
 Telco Customer Churn CSV
           |
           v
@@ -88,7 +158,7 @@ Churn Predictions
           |
           v
 PostgreSQL: analytics.predictions
-```
+
 
 ### Airflow DAG
 
@@ -142,3 +212,31 @@ The `analytics.predictions` table stores:
 - `scored_at`: UTC timestamp of prediction generation.
 
 The pipeline loads an existing model for inference; model training is handled separately.
+
+## Streamlit Dashboard
+
+The project includes an interactive Streamlit dashboard for exploring customer churn predictions and identifying at-risk customers.
+
+### Dashboard features
+
+KPIs: Total customers, predicted churn rate, high-risk customers, and last scoring time.
+
+At-risk customers: Top 20 customers ranked by churn probability.
+
+Segment analysis: Predicted churn rates by contract type and internet service.
+
+Interactive filters: Contract type, internet service, and minimum churn probability.
+
+Model explainability: SHAP summary plot and model comparison results.
+
+The dashboard reads data from the analytics.churn_dashboard dbt model, combining customer features with predictions stored by the Airflow pipeline.
+
+### Running the Dashboard
+
+From the project root:
+
+streamlit run app/dashboard.py
+
+Open the dashboard at http://localhost:8501.
+
+The dashboard uses cached, read-only database queries and does not retrain the model or generate predictions.
