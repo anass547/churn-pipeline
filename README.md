@@ -240,3 +240,14 @@ streamlit run app/dashboard.py
 Open the dashboard at http://localhost:8501.
 
 The dashboard uses cached, read-only database queries and does not retrain the model or generate predictions.
+
+## Model Explainability
+
+### SHAP Feature Importance
+![SHAP Feature Importance](ml/reports/shap_importance.png)
+
+### SHAP Summary Plot
+![SHAP Summary Plot](ml/reports/shap_summary.png)
+
+### SHAP Explanation — High-Risk Customer
+![SHAP Waterfall Plot](ml/reports/shap_waterfall_high_risk.png)
